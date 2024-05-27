@@ -1,3 +1,3 @@
 # Note
 
-Collector binary: otel-build-test/otel-custom
+Collector binary: otel-build-test/otelcol-custom

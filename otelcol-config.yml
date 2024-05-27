@@ -1,0 +1,47 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+        cors:
+          allowed_origins:
+            - "http://*"
+            - "https://*"
+
+exporters:
+  splunk_hec:
+    token: "30c27c47-f777-4ad5-9b24-3d10c239f1f2"
+    endpoint: "http://192.168.1.101:8088/services/collector/event"
+    index: "otel_dotnet"
+    source: "obtest"
+
+processors:
+  batch:
+  filter:
+    metrics:
+      exclude:
+        match_type: strict
+        metric_names:
+          - queueSize
+  probabilistic_sampler:
+    sampling_percentage: 10
+
+service:
+  pipelines:
+#    metrics:
+#      receivers: [otlp]
+#      processors: [batch]
+#      exporters: [splunk_hec]
+    traces:
+      receivers: [otlp]
+      processors: [batch, probabilistic_sampler]
+      exporters: [splunk_hec]
+
+
+

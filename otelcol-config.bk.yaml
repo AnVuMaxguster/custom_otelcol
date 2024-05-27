@@ -1,0 +1,96 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+
+#receivers:
+#  otlp:
+#    protocols:
+#      grpc:
+#      http:
+#        cors:
+#          allowed_origins:
+#            - "http://*"
+#            - "https://*"
+#
+#exporters:
+#  otlp:
+#    endpoint: "http://192.168.1.105:4317"
+#    tls:
+#      insecure: true
+#  logging:
+#
+#  elasticsearch/trace:
+#    endpoints: [https://192.168.1.105:9200]
+#    traces_index: trace_index
+#    api_key: "TFd1MlA0MEJfT09pa29henpiTUU6TkRMMFBBakFUOE9tZ0JVVnNSUTltZw=="
+#    tls:
+#      insecure_skip_verify: true
+#
+#processors:
+#  batch:
+#
+#  filter:
+#    metrics:
+#      exclude:
+#        match_type: strict
+#        metric_names:
+#          - queueSize
+#
+#connectors:
+#  spanmetrics:
+#
+#service:
+#  pipelines:
+#    traces:
+#      receivers: [otlp]
+#      processors: [batch]
+#      exporters: [elasticsearch/trace]
+#
+#
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+        cors:
+          allowed_origins:
+            - "http://*"
+            - "https://*"
+
+exporters:
+  otlphttp/elastic:
+    endpoint: "http://192.168.1.106:8200"
+    compression: none
+    headers:
+      Authorization: "Bearer Admin@123!"
+    tls:
+      insecure_skip_verify: true
+  logging:
+
+processors:
+  batch:
+
+  filter:
+    metrics:
+      exclude:
+        match_type: strict
+        metric_names:
+          - queueSize
+
+connectors:
+  spanmetrics:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging,otlphttp/elastic]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging,otlphttp/elastic]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging,otlphttp/elastic]

@@ -1,0 +1,36 @@
+version: '3.9'
+x-default-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: "5m"
+    max-file: "2"
+
+networks:
+  default:
+    name: opentelemetry-demo
+    driver: bridge
+
+services:
+  otelcol:
+    image: pigdatacollector:1.0-otelcol
+    container_name: otel-col
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      cache_from:
+        - pigdatacollector:1.0-otelcol
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    restart: unless-stopped
+    command: [ "--config=/etc/otelcol-config.yml" ]
+    volumes:
+      - ./otelcol-config.yml:/etc/otelcol-config.yml
+    ports:
+      - "4317:4317"          # OTLP over gRPC receiver
+      - "4318:4318"     # OTLP over HTTP receiver
+      #- "9464:9464"          # Prometheus exporter
+      #- "8888:8888"          # metrics endpoint
+    logging: *logging
+  
